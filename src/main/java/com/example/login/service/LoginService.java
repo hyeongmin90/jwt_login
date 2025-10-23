@@ -8,7 +8,6 @@ import com.example.login.domain.dto.RegisterDto;
 import com.example.login.domain.dto.RegisterResponseDto;
 import com.example.login.infra.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
