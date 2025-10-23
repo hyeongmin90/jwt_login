@@ -15,12 +15,15 @@ public class RegisterDto {
 
     private String email;
 
+    private String role;
+
     public User toEntity(RegisterDto registerDto, String password){
         User user = new User();
         user.setLoginId(registerDto.getLoginId());
         user.setPassword(password);
         user.setUsername(registerDto.getUsername());
         user.setEmail(registerDto.getEmail());
+        user.setRole(registerDto.getRole());
         return user;
     }
 }

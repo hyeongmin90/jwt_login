@@ -13,4 +13,6 @@ public class LoginResponseDto {
     private Long expireTime;
 
     private String refreshToken;
+
+    private String role;
 }

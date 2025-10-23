@@ -3,12 +3,20 @@ package com.example.login.infra;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Comment;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.sql.Date;
+import java.util.Collection;
+import java.util.Collections;
+
 
 @Component
 @Slf4j
@@ -26,7 +34,34 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public boolean isExpired(String token){
+    public Authentication getAuthentication(String token){
+        Claims claims = parseClaim(token);
+
+        Long userId = claims.get("id", Long.class);
+        String role = claims.get("role", String.class);
+        GrantedAuthority authority = new SimpleGrantedAuthority(role);
+        Collection<GrantedAuthority> authorities = Collections.singletonList(authority);
+
+        UserDetails principal = new User(userId.toString(), "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    private Claims parseClaim(String token){
+        try{
+            return Jwts.parserBuilder()
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+        catch (Exception e){
+            log.info("Access Token 파싱 실패: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean validateToken(String token){
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getKey())
@@ -45,18 +80,18 @@ public class JwtUtil {
         return true;
     }
 
-    public String createAccessToken(Long id, String name) {
-        return createToken(id, name, expirationTime);
+    public String createAccessToken(Long id, String role) {
+        return createToken(id, role, expirationTime);
     }
 
-    public String createRefreshToken(Long id, String name){
-        return createToken(id, name, refreshTokenExpirationTime);
+    public String createRefreshToken(Long id, String role){
+        return createToken(id, role, refreshTokenExpirationTime);
     }
 
-    private String createToken(Long id, String name, Long expirationTime) {
+    private String createToken(Long id, String role, Long expirationTime) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
-        claims.put("name", name);
+        claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)

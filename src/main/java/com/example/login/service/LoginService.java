@@ -33,8 +33,8 @@ public class LoginService {
         if (!passwordEncoder.matches(user.getPassword(), loginDto.getPassword())){
             throw new BadCredentialsException("ID or Password is not correct");
         }
-        String token = jwtUtil.createAccessToken(user.getUserId(), user.getUsername());
-        String refreshToken = jwtUtil.createRefreshToken(user.getUserId(), user.getUsername());
+        String token = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId(), user.getRole());
         LoginResponseDto responseDto = new LoginResponseDto();
         
         responseDto.setLoginId(loginDto.getLoginId());
