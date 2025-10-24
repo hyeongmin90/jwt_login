@@ -1,0 +1,21 @@
+jwt:
+  secretKet: 1sdj21enw#dskjqowe12xnc4sj*]a[sd/asd
+
+spring:
+  application:
+    name: login
+
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  datasource:
+    url: localhost:3306
+    username: root
+    password: admin123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
