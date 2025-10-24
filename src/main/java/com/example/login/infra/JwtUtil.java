@@ -42,15 +42,23 @@ public class JwtUtil {
 
     public Authentication getAuthentication(String token){
         Claims claims = parseClaim(token);
-
-        Long userId = claims.get("id", Long.class);
+        String subject = claims.getSubject();
         String role = claims.get("role", String.class);
+
         GrantedAuthority authority = new SimpleGrantedAuthority(role);
         Collection<GrantedAuthority> authorities = Collections.singletonList(authority);
 
-        UserDetails principal = new User(userId.toString(), "", authorities);
+        UserDetails principal = new User(subject, "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    public UserInfo getInfoFromToken(String token){
+        Claims claims = parseClaim(token);
+        return UserInfo.builder()
+                .id(claims.get("id", Long.class))
+                .name(claims.getSubject())
+                .build();
     }
 
     private Claims parseClaim(String token){
@@ -105,12 +113,9 @@ public class JwtUtil {
     }
 
     private String createToken(Long id, String role, Key key, Long expirationTime) {
-        Claims claims = Jwts.claims();
-        claims.put("id", id);
-        claims.put("role", role);
-
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(String.valueOf(id))
+                .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)

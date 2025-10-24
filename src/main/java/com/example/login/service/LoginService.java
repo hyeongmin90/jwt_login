@@ -4,6 +4,7 @@ import com.example.login.domain.User;
 import com.example.login.domain.UserRepository;
 import com.example.login.domain.dto.*;
 import com.example.login.infra.JwtUtil;
+import com.example.login.infra.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,12 +33,8 @@ public class LoginService {
             throw new BadCredentialsException("ID or Password is not correct");
         }
         String accessToken = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+        String refreshToken = redisService.createRefreshTokenWithSave(user.getUserId(), user.getRole());
 
-        String refreshToken = jwtUtil.createRefreshToken(user.getUserId(), user.getRole());
-        String id = String.valueOf(user.getUserId());
-        Duration refreshTokenValidity = Duration.ofDays(7);
-        redisService.setRefreshToken(id, refreshToken, refreshTokenValidity);
-        
         return LoginResponseDto.builder()
                 .loginId(loginDto.getLoginId())
                 .username(user.getUsername())
@@ -57,10 +54,24 @@ public class LoginService {
     public ReissueResponseDto userReissue(ReissueDto reissueDto){
         String refreshToken = reissueDto.getRefreshToken();
         if (!jwtUtil.validateRefreshToken(refreshToken)){
+            throw new BadCredentialsException("사용 불가한 Refresh Token");
+        }
+        UserInfo userInfo = jwtUtil.getInfoFromToken(refreshToken);
 
+        Long userId = userInfo.getId();
+        String storedRefreshToken = redisService.getRefreshToken(String.valueOf(userId));
+
+        if(storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)){
+            throw new BadCredentialsException("사용 불가한 Refresh Token");
         }
 
-        ReissueResponseDto responseDto = new ReissueResponseDto();
-        return responseDto;
+        String username = userInfo.getName();
+        String newAccessToken = jwtUtil.createAccessToken(userId, username);
+        String newRefreshToken = redisService.createRefreshTokenWithSave(userId, username);
+
+        return ReissueResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 }

@@ -36,6 +36,4 @@ public class LoginController {
     public String getFlag(){
         return "Login Success";
     }
-
-
 }
