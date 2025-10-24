@@ -22,16 +22,22 @@ import java.util.Collections;
 @Slf4j
 public class JwtUtil {
 
-    @Value("${jwt.secretKet}")
-    private String secretKey;
+    @Value("${jwt.access-secretKey}")
+    private String accessSecretKey;
+    @Value("${jwt.refresh-secretkey}")
+    private String refreshSecretKey;
 
     //30분
     public final Long expirationTime = 30 * 60 * 1000L;
     //7일
     public final Long refreshTokenExpirationTime = 7 * 24 * 60 * 60 * 1000L;
 
-    private Key getKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    private Key getAccessKey() {
+        return Keys.hmacShaKeyFor(accessSecretKey.getBytes());
+    }
+
+    private Key getRefreshKey() {
+        return Keys.hmacShaKeyFor(refreshSecretKey.getBytes());
     }
 
     public Authentication getAuthentication(String token){
@@ -50,7 +56,7 @@ public class JwtUtil {
     private Claims parseClaim(String token){
         try{
             return Jwts.parserBuilder()
-                    .setSigningKey(getKey())
+                    .setSigningKey(getAccessKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -61,34 +67,44 @@ public class JwtUtil {
         }
     }
 
-    public boolean validateToken(String token){
+    public boolean validateAccessToken(String accessToken){
+        return validateToken(accessToken, getAccessKey());
+    }
+
+    public boolean validateRefreshToken(String refreshToken){
+        return validateToken(refreshToken, getRefreshKey());
+    }
+
+    private boolean validateToken(String token, Key key){
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getKey())
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            log.info("Valid Token: User {}-{}", claims.get("id"), claims.get("name"));
-            return false;
-
+                    .parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.warn("잘못된 JWT 서명입니다. Token: {}", token);
         } catch (ExpiredJwtException e) {
-            log.info("Token expired: {}", e.getMessage());
+            log.warn("만료된 JWT 토큰입니다. Token: {}", token);
+        } catch (UnsupportedJwtException e) {
+            log.warn("지원되지 않는 JWT 토큰입니다. Token: {}", token);
+        } catch (IllegalArgumentException e) {
+            log.warn("JWT 토큰이 잘못되었습니다. Token: {}", token);
         } catch (JwtException e) {
-            log.info("Token forgery or other errors: {}", e.getMessage());
+            log.error("JWT 처리 중 알 수 없는 오류가 발생했습니다. Token: {}", token, e);
         }
-        return true;
+        return false;
     }
 
     public String createAccessToken(Long id, String role) {
-        return createToken(id, role, expirationTime);
+        return createToken(id, role, getAccessKey(), expirationTime);
     }
 
     public String createRefreshToken(Long id, String role){
-        return createToken(id, role, refreshTokenExpirationTime);
+        return createToken(id, role, getRefreshKey(), refreshTokenExpirationTime);
     }
 
-    private String createToken(Long id, String role, Long expirationTime) {
+    private String createToken(Long id, String role, Key key, Long expirationTime) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
         claims.put("role", role);
@@ -97,7 +113,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 

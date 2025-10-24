@@ -1,5 +1,6 @@
 jwt:
-  secretKet: 1sdj21enw#dskjqowe12xnc4sj*]a[sd/asd
+  access-secretKey: 1sdj21enw#dskjqowe12xnc4sj*]a[sd/asw
+  refresh-secretkey: 12n#sap)gsa^lp/%21*ads1@!adn2.=-asf0vm,kd4wqp
 
 spring:
   application:

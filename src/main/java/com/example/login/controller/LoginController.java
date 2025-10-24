@@ -1,9 +1,6 @@
 package com.example.login.controller;
 
-import com.example.login.domain.dto.LoginDto;
-import com.example.login.domain.dto.LoginResponseDto;
-import com.example.login.domain.dto.RegisterDto;
-import com.example.login.domain.dto.RegisterResponseDto;
+import com.example.login.domain.dto.*;
 import com.example.login.service.LoginService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +9,20 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class LoginController {
 
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> Login(@RequestBody @Valid LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginDto loginDto) {
         LoginResponseDto responseDto = loginService.userLogin(loginDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<ReissueResponseDto> reissue(@RequestBody @Valid ReissueDto reissueDto){
+        ReissueResponseDto responseDto = loginService.userReissue(reissueDto);
         return ResponseEntity.ok(responseDto);
     }
 

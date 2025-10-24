@@ -2,16 +2,14 @@ package com.example.login.service;
 
 import com.example.login.domain.User;
 import com.example.login.domain.UserRepository;
-import com.example.login.domain.dto.LoginDto;
-import com.example.login.domain.dto.LoginResponseDto;
-import com.example.login.domain.dto.RegisterDto;
-import com.example.login.domain.dto.RegisterResponseDto;
+import com.example.login.domain.dto.*;
 import com.example.login.infra.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -20,6 +18,7 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
     private final JwtUtil jwtUtil;
 
     public LoginResponseDto userLogin(LoginDto loginDto){
@@ -32,17 +31,20 @@ public class LoginService {
         if (!passwordEncoder.matches(user.getPassword(), loginDto.getPassword())){
             throw new BadCredentialsException("ID or Password is not correct");
         }
-        String token = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId(), user.getRole());
-        LoginResponseDto responseDto = new LoginResponseDto();
+        String id = String.valueOf(user.getUserId());
+        Duration refreshTokenValidity = Duration.ofDays(7);
+        redisService.setRefreshToken(id, refreshToken, refreshTokenValidity);
         
-        responseDto.setLoginId(loginDto.getLoginId());
-        responseDto.setUsername(user.getUsername());
-        responseDto.setToken(token);
-        responseDto.setExpireTime(30 * 60L);
-        responseDto.setRefreshToken(refreshToken);
-        
-        return responseDto;
+        return LoginResponseDto.builder()
+                .loginId(loginDto.getLoginId())
+                .username(user.getUsername())
+                .token(accessToken)
+                .expireTime(30 * 60L)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public RegisterResponseDto userRegister(RegisterDto registerDto){
@@ -50,5 +52,15 @@ public class LoginService {
         User user = registerDto.toEntity(registerDto, encodedPassword);
         userRepository.save(user);
         return new RegisterResponseDto().form(registerDto);
+    }
+
+    public ReissueResponseDto userReissue(ReissueDto reissueDto){
+        String refreshToken = reissueDto.getRefreshToken();
+        if (!jwtUtil.validateRefreshToken(refreshToken)){
+
+        }
+
+        ReissueResponseDto responseDto = new ReissueResponseDto();
+        return responseDto;
     }
 }
