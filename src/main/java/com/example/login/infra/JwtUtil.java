@@ -24,7 +24,7 @@ public class JwtUtil {
 
     @Value("${jwt.access-secretKey}")
     private String accessSecretKey;
-    @Value("${jwt.refresh-secretkey}")
+    @Value("${jwt.refresh-secretKey}")
     private String refreshSecretKey;
 
     //30분

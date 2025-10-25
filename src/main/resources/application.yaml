@@ -1,11 +1,10 @@
 jwt:
   access-secretKey: 1sdj21enw#dskjqowe12xnc4sj*]a[sd/asw
-  refresh-secretkey: 12n#sap)gsa^lp/%21*ads1@!adn2.=-asf0vm,kd4wqp
+  refresh-secretKey: 12n#sap)gsa^lp/%21*ads1@!adn2.=-asf0vm,kd4wqp
 
 spring:
   application:
     name: login
-
 
   data:
     redis:
@@ -13,7 +12,7 @@ spring:
       port: 6379
 
   datasource:
-    url: localhost:3306
+    url: jdbc:mysql://localhost:3306/my_db
     username: root
     password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver

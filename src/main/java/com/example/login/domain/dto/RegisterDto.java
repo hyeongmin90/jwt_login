@@ -1,6 +1,6 @@
 package com.example.login.domain.dto;
 
-import com.example.login.domain.User;
+import com.example.login.domain.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,13 +17,13 @@ public class RegisterDto {
 
     private String role;
 
-    public User toEntity(RegisterDto registerDto, String password){
-        User user = new User();
-        user.setLoginId(registerDto.getLoginId());
-        user.setPassword(password);
-        user.setUsername(registerDto.getUsername());
-        user.setEmail(registerDto.getEmail());
-        user.setRole(registerDto.getRole());
-        return user;
+    public Member toEntity(RegisterDto registerDto, String password){
+        Member member = new Member();
+        member.setLoginId(registerDto.getLoginId());
+        member.setPassword(password);
+        member.setUsername(registerDto.getUsername());
+        member.setEmail(registerDto.getEmail());
+        member.setRole(registerDto.getRole());
+        return member;
     }
 }

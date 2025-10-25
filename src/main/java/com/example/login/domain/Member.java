@@ -1,16 +1,18 @@
 package com.example.login.domain;
 
-import com.example.login.domain.dto.RegisterDto;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
 @Setter
 @Getter
-public class User {
+public class Member {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     private String loginId;
