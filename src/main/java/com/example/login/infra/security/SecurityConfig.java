@@ -1,4 +1,4 @@
-package com.example.login.infra;
+package com.example.login.infra.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

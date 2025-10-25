@@ -1,4 +1,4 @@
-package com.example.login.infra;
+package com.example.login.infra.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

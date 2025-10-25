@@ -1,4 +1,4 @@
-package com.example.login.controller;
+package com.example.login.infra.controller;
 
 import com.example.login.domain.dto.*;
 import com.example.login.service.LoginService;

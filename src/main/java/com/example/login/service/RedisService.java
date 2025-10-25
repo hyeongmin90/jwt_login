@@ -1,10 +1,8 @@
 package com.example.login.service;
 
-import com.example.login.infra.JwtUtil;
+import com.example.login.infra.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
