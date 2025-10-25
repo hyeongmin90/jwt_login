@@ -12,12 +12,12 @@ This project is a Spring Boot-based authentication template that uses JWT (JSON 
 
 ## 🛠️ Technologies Used
 
--   Java 17
+-   Java 21
 -   Spring Boot 3.x
 -   Spring Security
 -   JWT (jjwt-api, jjwt-impl, jjwt-jackson)
 -   Redis (Spring Data Redis)
--   H2 Database (or other configured database)
+-   MySQL 8.0
 -   Gradle
 
 ## 🚀 Getting Started
