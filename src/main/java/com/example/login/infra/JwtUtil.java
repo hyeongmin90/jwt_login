@@ -41,7 +41,7 @@ public class JwtUtil {
     }
 
     public Authentication getAuthentication(String token){
-        Claims claims = parseClaim(token);
+        Claims claims = parseClaim(token, getAccessKey());
         String subject = claims.getSubject();
         String role = claims.get("role", String.class);
 
@@ -53,18 +53,18 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    public UserInfo getInfoFromToken(String token){
-        Claims claims = parseClaim(token);
+    public UserInfo getInfoFromRefreshToken(String token){
+        Claims claims = parseClaim(token, getRefreshKey());
         return UserInfo.builder()
-                .id(claims.get("id", Long.class))
-                .name(claims.getSubject())
+                .id(Long.parseLong(claims.getSubject()))
+                .role(claims.get("role", String.class))
                 .build();
     }
 
-    private Claims parseClaim(String token){
+    private Claims parseClaim(String token, Key key){
         try{
             return Jwts.parserBuilder()
-                    .setSigningKey(getAccessKey())
+                    .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

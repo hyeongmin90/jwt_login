@@ -6,12 +6,14 @@ import com.example.login.domain.dto.*;
 import com.example.login.infra.JwtUtil;
 import com.example.login.infra.UserInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -55,7 +57,8 @@ public class LoginService {
         if (!jwtUtil.validateRefreshToken(refreshToken)){
             throw new BadCredentialsException("사용 불가한 Refresh Token");
         }
-        UserInfo userInfo = jwtUtil.getInfoFromToken(refreshToken);
+        UserInfo userInfo = jwtUtil.getInfoFromRefreshToken(refreshToken);
+        log.info("USER {}:{} REISSUE", userInfo.getId(), userInfo.getRole());
 
         Long userId = userInfo.getId();
         String storedRefreshToken = redisService.getRefreshToken(String.valueOf(userId));
@@ -64,7 +67,7 @@ public class LoginService {
             throw new BadCredentialsException("사용 불가한 Refresh Token");
         }
 
-        String username = userInfo.getName();
+        String username = userInfo.getRole();
         String newAccessToken = jwtUtil.createAccessToken(userId, username);
         String newRefreshToken = redisService.createRefreshTokenWithSave(userId, username);
 

@@ -9,5 +9,5 @@ import lombok.Setter;
 @Builder
 public class UserInfo {
     private Long id;
-    private String name;
+    private String role;
 }
