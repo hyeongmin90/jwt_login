@@ -55,16 +55,15 @@ public class LoginService {
     public ReissueResponseDto userReissue(ReissueDto reissueDto){
         String refreshToken = reissueDto.getRefreshToken();
         if (!jwtUtil.validateRefreshToken(refreshToken)){
-            throw new BadCredentialsException("사용 불가한 Refresh Token");
+            throw new BadCredentialsException("Invalid Refresh Token");
         }
         UserInfo userInfo = jwtUtil.getInfoFromRefreshToken(refreshToken);
-        log.info("USER {}:{} REISSUE", userInfo.getId(), userInfo.getRole());
 
         Long userId = userInfo.getId();
         String storedRefreshToken = redisService.getRefreshToken(String.valueOf(userId));
 
         if(storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)){
-            throw new BadCredentialsException("사용 불가한 Refresh Token");
+            throw new BadCredentialsException("Invalid Refresh Token");
         }
 
         String username = userInfo.getRole();

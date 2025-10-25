@@ -13,13 +13,13 @@ public class RedisConfig {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
 
-        // Key: StringRedisSerializer 사용
+        // Key: Use StringRedisSerializer
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 
-        // Value: StringRedisSerializer 사용 (객체를 저장할 경우 new GenericJackson2JsonRedisSerializer())
+        // Value: Use StringRedisSerializer (for objects, use new GenericJackson2JsonRedisSerializer())
         redisTemplate.setValueSerializer(new StringRedisSerializer());
 
-        // Hash의 Key와 Value 직렬화 방식 설정
+        // Configure serialization for Hash Key and Value
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 

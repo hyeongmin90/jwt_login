@@ -27,9 +27,9 @@ public class JwtUtil {
     @Value("${jwt.refresh-secretKey}")
     private String refreshSecretKey;
 
-    //30분
+    //30 minutes
     public final Long expirationTime = 30 * 60 * 1000L;
-    //7일
+    //7 days
     public final Long refreshTokenExpirationTime = 7 * 24 * 60 * 60 * 1000L;
 
     private Key getAccessKey() {
@@ -70,7 +70,7 @@ public class JwtUtil {
                     .getBody();
         }
         catch (Exception e){
-            log.info("Access Token 파싱 실패: {}", e.getMessage());
+            log.info("Failed to parse Access Token: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -91,15 +91,15 @@ public class JwtUtil {
                     .parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.warn("잘못된 JWT 서명입니다. Token: {}", token);
+            log.warn("Invalid JWT signature. Token: {}", token);
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다. Token: {}", token);
+            log.warn("Expired JWT token. Token: {}", token);
         } catch (UnsupportedJwtException e) {
-            log.warn("지원되지 않는 JWT 토큰입니다. Token: {}", token);
+            log.warn("Unsupported JWT token. Token: {}", token);
         } catch (IllegalArgumentException e) {
-            log.warn("JWT 토큰이 잘못되었습니다. Token: {}", token);
+            log.warn("Invalid JWT token. Token: {}", token);
         } catch (JwtException e) {
-            log.error("JWT 처리 중 알 수 없는 오류가 발생했습니다. Token: {}", token, e);
+            log.error("An unknown error occurred while processing JWT. Token: {}", token, e);
         }
         return false;
     }
